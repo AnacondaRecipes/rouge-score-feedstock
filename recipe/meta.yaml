@@ -54,7 +54,10 @@ test:
 
     # adapted from run.sh - but we need (hundreds of) test files from
     # the 1.3GB monorepo of which we've only copied a few above
-    - python -m rouge_score.io_test
+    #
+    # io_test.py on Windows generates Permission denied (re-)using
+    # temprary files.
+    - python -m rouge_score.io_test  # [not win]
 
     # rouge_scorer_test.py wants the *_large.txt files, above, and
     # then fails to access punkt:
