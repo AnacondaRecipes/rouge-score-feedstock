@@ -6,38 +6,83 @@ package:
   version: {{ version }}
 
 source:
-  url: https://pypi.io/packages/source/{{ name[0] }}/{{ name }}/rouge_score-{{ version }}.tar.gz
-  sha256: c7d4da2683e68c9abf0135ef915d63a46643666f848e558a1b9f7ead17ff0f04
+  - url: https://pypi.io/packages/source/{{ name[0] }}/{{ name }}/rouge_score-{{ version }}.tar.gz
+    sha256: c7d4da2683e68c9abf0135ef915d63a46643666f848e558a1b9f7ead17ff0f04
+  - url: https://raw.githubusercontent.com/google-research/google-research/master/rouge/testdata/delimited.txt
+    sha256: 9ff055693db54d17d2fa18bff819c572cf9c6372b58a02188ed01e867a94a8c9
+    folder: rouge_score/testdata
+  - url: https://raw.githubusercontent.com/google-research/google-research/master/rouge/testdata/prediction.txt
+    sha256: 421c9e8f98c252f86c1723afb992b56b5c2d48a2c5b9c71100e75aaec3adec74
+    folder: rouge_score/testdata
+  - url: https://raw.githubusercontent.com/google-research/google-research/master/rouge/testdata/target.txt
+    sha256: 39701c998e599ec28b58abace665601de955685d6c13600d3fd4ecad192cc947
+    folder: rouge_score/testdata
+  # - url: https://raw.githubusercontent.com/google-research/google-research/master/rouge/testdata/prediction_large.txt
+  #   sha256: 801559be94a0c6110e50f08396582bd82558a6bcfb6be4456f24a5e644574c22
+  #   folder: rouge_score/testdata
+  # - url: https://raw.githubusercontent.com/google-research/google-research/master/rouge/testdata/target_large.txt
+  #   sha256: d4eb90a26ce7207218e6a892a2d01d998e7ca2e10da1138a5cc2b3d27f8b8703
+  #   folder: rouge_score/testdata
 
 build:
   number: 0
-  noarch: python
-  script: {{ PYTHON }} -m pip install . -vv
+  skip: true  # [ py<37 ]
+  script: {{ PYTHON }} -m pip install . -vv --no-deps --no-build-isolation
 
 requirements:
   host:
-    - python >=3.7
+    - python
     - pip
+    - setuptools
+    - wheel
   run:
-    - python >=3.7
+    - python
     - absl-py
     - nltk
     - numpy
     - six >=1.14.0
 
 test:
+  source_files:
+    - rouge_score
   imports:
     - rouge_score
-  commands:
-    - pip check
   requires:
     - pip
+  commands:
+    - pip check
+
+    # adapted from run.sh - but we need (hundreds of) test files from
+    # the 1.3GB monorepo of which we've only copied a few above
+    #
+    # io_test.py on Windows generates Permission denied (re-)using
+    # temprary files.
+    - python -m rouge_score.io_test  # [not win]
+
+    # rouge_scorer_test.py wants the *_large.txt files, above, and
+    # then fails to access punkt:
+
+    # Resource punkt not found.
+    # Please use the NLTK Downloader to obtain the resource:
+
+    # >>> import nltk
+    # >>> nltk.download('punkt')
+
+    #- python -m rouge_score.rouge_scorer_test
+
+    # scoring_test.py uses many testdata files
+    #- python -m rouge_score.scoring_test
+
+    # other files called *.test.py !
+    - python -m rouge_score.tokenize_test
+    - python -m rouge_score.tokenizers_test
 
 about:
   home: https://github.com/google-research/google-research/tree/master/rouge
   summary: Pure python implementation of ROUGE-1.5.5.
   license: Apache-2.0
   license_file: LICENSE
+  license_family: Apache
   description: |
     A naive python implementation of the original perl package, ROUGE from Google-Research.
 
@@ -66,6 +111,10 @@ about:
     Note that not all options provided by the original perl ROUGE script are supported, but the subset of options that are implemented should replicate the original functionality.
 
     PyPI: [https://pypi.org/project/rouge-score/](https://pypi.org/project/rouge-score/)
+
+  # There's no clear doc_url other than this README
+  doc_url: https://github.com/google-research/google-research/blob/master/rouge/README.md
+  dev_url: https://github.com/google-research/google-research/tree/master/rouge
 
 extra:
   recipe-maintainers:
