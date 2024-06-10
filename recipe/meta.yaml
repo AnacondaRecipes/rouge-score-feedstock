@@ -113,7 +113,7 @@ about:
     PyPI: [https://pypi.org/project/rouge-score/](https://pypi.org/project/rouge-score/)
 
   # There's no clear doc_url other than this README
-  doc_url: https://github.com/google-research/google-research/tree/master/rouge
+  doc_url: https://github.com/google-research/google-research/blob/master/rouge/README.md
   dev_url: https://github.com/google-research/google-research/tree/master/rouge
 
 extra:
