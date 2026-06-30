@@ -47,6 +47,7 @@ test:
     - rouge_score
   imports:
     - rouge_score
+    - rouge_score.rouge_scorer
   requires:
     - pip
   commands:
@@ -117,5 +118,7 @@ about:
   dev_url: https://github.com/google-research/google-research/tree/master/rouge
 
 extra:
+  skip-lints:
+    - cbc_dep_in_run_missing_from_host
   recipe-maintainers:
     - sugatoray
